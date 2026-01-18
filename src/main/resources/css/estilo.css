@@ -1,0 +1,335 @@
+/* ==========================================
+   Sistema de Dimensionamento Elétrico
+   Arquivo de Estilos CSS
+   ========================================== */
+
+/* Cores Principais */
+.root {
+    -fx-primary-color: #2C3E50;
+    -fx-secondary-color: #3498DB;
+    -fx-success-color: #27AE60;
+    -fx-warning-color: #F39C12;
+    -fx-danger-color: #E74C3C;
+    -fx-background: #ECF0F1;
+}
+
+/* Fonte Padrão */
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 13px;
+}
+
+/* Títulos */
+.label {
+    -fx-text-fill: #2C3E50;
+}
+
+/* Campos de Texto */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 5px 10px;
+}
+
+.text-field:focused {
+    -fx-border-color: #3498DB;
+    -fx-border-width: 2px;
+}
+
+/* ComboBox */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.combo-box:focused {
+    -fx-border-color: #3498DB;
+}
+
+/* Botões */
+.button {
+    -fx-background-color: #ECF0F1;
+    -fx-text-fill: #2C3E50;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 8px 15px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #D5DBDB;
+}
+
+.button:pressed {
+    -fx-background-color: #BDC3C7;
+}
+
+/* Botões da Toolbar */
+.toolbar-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2C3E50;
+    -fx-border-width: 0;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 12px;
+}
+
+.toolbar-button:hover {
+    -fx-background-color: #D5DBDB;
+    -fx-background-radius: 3px;
+}
+
+/* Botão Primário */
+.toolbar-button-primary {
+    -fx-background-color: #3498DB;
+    -fx-text-fill: white;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 8px 15px;
+    -fx-font-weight: bold;
+}
+
+.toolbar-button-primary:hover {
+    -fx-background-color: #2980B9;
+}
+
+/* Botão de Sucesso */
+.toolbar-button-success {
+    -fx-background-color: #27AE60;
+    -fx-text-fill: white;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 8px 15px;
+    -fx-font-weight: bold;
+}
+
+.toolbar-button-success:hover {
+    -fx-background-color: #229954;
+}
+
+/* Menu Bar */
+.menu-bar {
+    -fx-background-color: #2C3E50;
+}
+
+.menu-bar .label {
+    -fx-text-fill: white;
+}
+
+.menu-bar .menu:hover {
+    -fx-background-color: #34495E;
+}
+
+/* Menu Items */
+.menu-item {
+    -fx-padding: 5px 20px;
+}
+
+.menu-item:focused {
+    -fx-background-color: #3498DB;
+}
+
+/* Toolbar */
+.tool-bar {
+    -fx-background-color: #ECF0F1;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 5px 10px;
+}
+
+/* Separadores */
+.separator {
+    -fx-background-color: #BDC3C7;
+}
+
+/* TabPane */
+.tab-pane {
+    -fx-background-color: white;
+}
+
+.tab {
+    -fx-background-color: #ECF0F1;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 1px 1px 0 1px;
+    -fx-padding: 8px 15px;
+}
+
+.tab:selected {
+    -fx-background-color: white;
+    -fx-border-color: #3498DB;
+    -fx-border-width: 3px 3px 0 3px;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #2C3E50;
+    -fx-font-weight: bold;
+}
+
+/* TableView */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 1px;
+}
+
+.table-view .column-header {
+    -fx-background-color: #2C3E50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10px;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+}
+
+.table-row-cell {
+    -fx-background-color: white;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #F8F9FA;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #3498DB;
+    -fx-text-fill: white;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #D5DBDB;
+}
+
+.table-cell {
+    -fx-padding: 8px;
+}
+
+/* ScrollPane */
+.scroll-pane {
+    -fx-background-color: white;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: white;
+}
+
+/* SplitPane */
+.split-pane {
+    -fx-background-color: #ECF0F1;
+}
+
+.split-pane-divider {
+    -fx-background-color: #BDC3C7;
+    -fx-padding: 0 1px 0 1px;
+}
+
+/* GridPane */
+.grid-pane {
+    -fx-hgap: 10px;
+    -fx-vgap: 10px;
+    -fx-padding: 10px;
+}
+
+/* VBox e HBox */
+.vbox, .hbox {
+    -fx-spacing: 10px;
+}
+
+/* Alertas e Diálogos */
+.dialog-pane {
+    -fx-background-color: white;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #3498DB;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+/* ProgressBar */
+.progress-bar {
+    -fx-accent: #3498DB;
+}
+
+/* Labels com estilo especial */
+.label-titulo {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2C3E50;
+}
+
+.label-subtitulo {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2C3E50;
+}
+
+.label-destaque {
+    -fx-font-weight: bold;
+    -fx-text-fill: #3498DB;
+}
+
+.label-sucesso {
+    -fx-text-fill: #27AE60;
+    -fx-font-weight: bold;
+}
+
+.label-erro {
+    -fx-text-fill: #E74C3C;
+    -fx-font-weight: bold;
+}
+
+.label-aviso {
+    -fx-text-fill: #F39C12;
+    -fx-font-weight: bold;
+}
+
+/* Painel de Informações */
+.painel-info {
+    -fx-background-color: white;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 15px;
+}
+
+/* Cards */
+.card {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-background-radius: 5px;
+    -fx-padding: 20px;
+}
+
+/* Barra de Status */
+.status-bar {
+    -fx-background-color: #ECF0F1;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 5px 10px;
+}
+
+/* Tooltips */
+.tooltip {
+    -fx-background-color: #2C3E50;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 5px 10px;
+}
+
+/* Animações sutis */
+.button, .tab, .table-row-cell {
+    -fx-transition: background-color 0.2s;
+}
