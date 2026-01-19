@@ -13,13 +13,15 @@ public class DatabaseManager {
 
     private static Connection connection;
 
+    // ...[código igual ao seu até a linha de inicialização]...
+
     public static void inicializar() throws SQLException {
         // Garante que a pasta existe
         new File(DB_DIR).mkdirs();
-
         connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
         criarTabelas();
-        // popularTabelasNormativas(); // Reative quando tiver separado os arquivos de tabelas
+        // POPULAR TABELAS NORMATIVAS AGORA LIBERADO
+        popularTabelasNormativas();
     }
     /**
      * Cria todas as tabelas do sistema

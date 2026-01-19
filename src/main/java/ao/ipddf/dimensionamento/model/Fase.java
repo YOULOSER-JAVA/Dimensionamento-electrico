@@ -1,5 +1,5 @@
 package ao.ipddf.dimensionamento.model;
 
-enum Fase {
-    R, S, T
+public enum Fase {
+    R, S, T;
 }

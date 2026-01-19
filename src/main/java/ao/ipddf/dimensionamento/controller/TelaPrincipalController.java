@@ -3,7 +3,7 @@ package ao.ipddf.dimensionamento.controller;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory; // Importante!
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert.AlertType;
@@ -19,7 +19,7 @@ public class TelaPrincipalController implements Initializable {
     @FXML private TextField txtNomeProjeto;
     @FXML private TextField txtCliente;
     @FXML private TextField txtEndereco;
-    @FXML private ComboBox<String> cmbTipoAlimentacao;
+    @FXML private ComboBox<TipoAlimentacao> cmbTipoAlimentacao;
     @FXML private TextField txtTensaoNominal;
 
     @FXML private Label lblNumCompartimentos;
@@ -39,11 +39,10 @@ public class TelaPrincipalController implements Initializable {
     // --- TABELA COMPARTIMENTOS ---
     @FXML private TableView<Compartimento> tabelaCompartimentos;
     @FXML private TableColumn<Compartimento, String> colCompNome;
-    @FXML private TableColumn<Compartimento, String> colCompTipo;
+    @FXML private TableColumn<Compartimento, TipoCompartimento> colCompTipo;
     @FXML private TableColumn<Compartimento, Double> colCompArea;
     @FXML private TableColumn<Compartimento, Integer> colCompLampadas;
     @FXML private TableColumn<Compartimento, Integer> colCompTomadasUG;
-    // Adicione as outras colunas conforme necessário no FXML
 
     // --- TABELA CIRCUITOS ---
     @FXML private TableView<Circuito> tabelaCircuitos;
@@ -54,18 +53,12 @@ public class TelaPrincipalController implements Initializable {
 
     // Variáveis de Controle
     private Projeto projetoAtual;
-    // private CalculoIluminacaoService servicoIluminacao; // Descomente quando separar os arquivos
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Inicializa serviços (Comentei pois você precisa separar os arquivos primeiro)
-        // servicoIluminacao = new CalculoIluminacaoService();
-
-        // 1. Configurar ComboBox
-        cmbTipoAlimentacao.setItems(FXCollections.observableArrayList(
-                "Monofásica", "Bifásica", "Trifásica"
-        ));
-        cmbTipoAlimentacao.setValue("Trifásica");
+        // 1. Configurar ComboBox para Enum
+        cmbTipoAlimentacao.setItems(FXCollections.observableArrayList(TipoAlimentacao.values()));
+        cmbTipoAlimentacao.setValue(TipoAlimentacao.TRIFASICA);
         txtTensaoNominal.setText("220");
 
         // 2. Configurar Tabela de Compartimentos (VINCULAÇÃO)
@@ -74,6 +67,14 @@ public class TelaPrincipalController implements Initializable {
         colCompArea.setCellValueFactory(new PropertyValueFactory<>("area"));
         colCompLampadas.setCellValueFactory(new PropertyValueFactory<>("numeroLampadas"));
         colCompTomadasUG.setCellValueFactory(new PropertyValueFactory<>("numeroTomadasUG"));
+
+        colCompTipo.setCellFactory(column -> new TableCell<Compartimento, TipoCompartimento>() {
+            @Override
+            protected void updateItem(TipoCompartimento item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.toString());
+            }
+        });
 
         listaCompartimentos = FXCollections.observableArrayList();
         tabelaCompartimentos.setItems(listaCompartimentos);
@@ -87,31 +88,50 @@ public class TelaPrincipalController implements Initializable {
     private void novoProjeto() {
         projetoAtual = new Projeto();
         projetoAtual.setNome("Novo Projeto");
+        projetoAtual.setTipoAlimentacao(cmbTipoAlimentacao.getValue());
+        try {
+            projetoAtual.setTensaoNominal(Double.parseDouble(txtTensaoNominal.getText()));
+        } catch (NumberFormatException e) {
+            projetoAtual.setTensaoNominal(220);
+        }
 
-        // Limpar lista visual
         listaCompartimentos.clear();
-
         limparCampos();
         atualizarResumo();
         atualizarStatus("Novo projeto criado");
     }
 
-    // Exemplo temporário para testar a tabela
     @FXML
     private void adicionarCompartimento() {
-        // Num sistema real, abriria uma nova janela. Aqui vamos adicionar um teste.
-        Compartimento teste = new Compartimento("Quarto Teste", 4.0, 3.0, 2.8);
-        teste.setNumeroLampadas(2);
-        teste.setNumeroTomadasUG(3);
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/fxml/AdicionarCompartimentoDialog.fxml"));
+            DialogPane dialogPane = loader.load();
+            AdicionarCompartimentoDialogController dialogController = loader.getController();
 
-        projetoAtual.adicionarCompartimento(teste);
-        listaCompartimentos.add(teste); // Adiciona na lista visual
+            Dialog<Compartimento> dialog = new Dialog<>();
+            dialog.setDialogPane(dialogPane);
+            dialog.setTitle("Adicionar Compartimento");
 
-        atualizarResumo();
-        atualizarStatus("Compartimento adicionado");
+            dialog.setResultConverter(bt -> {
+                if (bt.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                    return dialogController.buildCompartimento();
+                }
+                return null;
+            });
+
+            var result = dialog.showAndWait();
+            result.ifPresent(comp -> {
+                projetoAtual.adicionarCompartimento(comp);
+                listaCompartimentos.add(comp);
+                atualizarResumo();
+                atualizarStatus("Compartimento adicionado: " + comp.getNome());
+            });
+
+        } catch (Exception e) {
+            mostrarAlerta("Erro", "Não foi possível adicionar", e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
-
-    // ... Mantenha os outros métodos (guardarProjeto, sair, etc) ...
 
     @FXML
     private void guardarProjeto() {
@@ -119,31 +139,47 @@ public class TelaPrincipalController implements Initializable {
     }
 
     @FXML
-    private void sair() { System.exit(0); }
+    private void sair() {
+        try {
+            ao.ipddf.dimensionamento.database.DatabaseManager.fecharConexao();
+        } catch (Exception ignored) {}
+        System.exit(0);
+    }
 
-    // ... Mantenha os métodos de menu (abrirIluminacao, etc) ...
-    @FXML private void abrirIluminacao() {}
-    @FXML private void abrirTomadas() {}
-    @FXML private void abrirClimatizacao() {}
-    @FXML private void abrirCircuitos() {}
-    @FXML private void abrirFotovoltaico() {}
-    @FXML private void calcularTudo() {}
-    @FXML private void editarCompartimento() {}
-    @FXML private void removerCompartimento() {}
+    // Métodos de menu (implemente conforme for desenvolvendo cada um)
+    @FXML private void abrirIluminacao() { mostrarAlerta("Dimensão", "Iluminação", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void abrirTomadas() { mostrarAlerta("Dimensão", "Tomadas", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void abrirClimatizacao() { mostrarAlerta("Dimensão", "Climatização", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void abrirCircuitos() { mostrarAlerta("Dimensão", "Circuitos", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void abrirFotovoltaico() { mostrarAlerta("Dimensão", "Fotovoltaico", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void calcularTudo() { mostrarAlerta("Cálculos", "Cálculo Geral", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void editarCompartimento() { mostrarAlerta("Edição", "Compartimento", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML
+    private void removerCompartimento() {
+        Compartimento c = tabelaCompartimentos.getSelectionModel().getSelectedItem();
+        if (c != null) {
+            projetoAtual.getCompartimentos().remove(c);
+            listaCompartimentos.remove(c);
+            atualizarResumo();
+            atualizarStatus("Compartimento removido");
+        } else {
+            mostrarAlerta("Aviso", "Remover Compartimento", "Selecione um compartimento para remover.", Alert.AlertType.WARNING);
+        }
+    }
     @FXML private void gerenciarCompartimentos() { tabPaneMain.getSelectionModel().select(0); }
-    @FXML private void gerarCircuitosAuto() {}
-    @FXML private void editarCircuito() {}
-    @FXML private void balancearFases() {}
-    @FXML private void gerarMemorial() {}
-    @FXML private void gerarTabelas() {}
-    @FXML private void gerarListaMateriais() {}
-    @FXML private void gerarDiagrama() {}
-    @FXML private void gerarRelatorioCompleto() {}
-    @FXML private void abrirCalculadora() {}
-    @FXML private void abrirTabelasNormativas() {}
-    @FXML private void abrirManual() {}
-    @FXML private void abrirSobre() {}
-    @FXML private void abrirProjeto() {}
+    @FXML private void gerarCircuitosAuto() { mostrarAlerta("Gerar", "Circuitos Automáticos", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void editarCircuito() { mostrarAlerta("Editar", "Circuito", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void balancearFases() { mostrarAlerta("Balancear", "Fases", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void gerarMemorial() { mostrarAlerta("Memorial", "Memorial Descritivo", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void gerarTabelas() { mostrarAlerta("Tabelas", "Tabelas Técnicas", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void gerarListaMateriais() { mostrarAlerta("Materiais", "Lista de Materiais", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void gerarDiagrama() { mostrarAlerta("Diagrama", "Unifilar", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void gerarRelatorioCompleto() { mostrarAlerta("Relatório", "Relatório Completo", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void abrirCalculadora() { mostrarAlerta("Ferramenta", "Calculadora", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void abrirTabelasNormativas() { mostrarAlerta("Ferramenta", "Tabelas Normativas", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void abrirManual() { mostrarAlerta("Ajuda", "Manual", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void abrirSobre() { mostrarAlerta("Ajuda", "Sobre", "Função em desenvolvimento", AlertType.INFORMATION); }
+    @FXML private void abrirProjeto() { mostrarAlerta("Abrir", "Projeto", "Função em desenvolvimento", AlertType.INFORMATION); }
 
     private void limparCampos() {
         txtNomeProjeto.clear();
@@ -166,6 +202,4 @@ public class TelaPrincipalController implements Initializable {
         alert.setContentText(c);
         alert.showAndWait();
     }
-
-    private boolean validarProjeto() { return true; }
 }
